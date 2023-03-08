@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+import time
+
+def check_compression_loss(filename):
+    start_t = time.time()
+    with open("antman_output.tmp", "w") as f:
+        subprocess.run(["../antman/antman", f"./test_files/{filename}", "1"], stdout=f)
+    end_t = time.time()
+    compression_t = end_t - start_t
+    print(f"Compression time: {compression_t:.2f}s")
+
+    start_t = time.time()
+    with open("giantman_output.tmp", "w") as f:
+        subprocess.run(["../giantman/giantman", "antman_output.tmp", "1"], stdout=f)
+    end_t = time.time()
+    decompression_t = end_t - start_t
+    print(f"Decompression time: {decompression_t:.2f}s")
+    print(f"Execution time: {compression_t + decompression_t:.2f}s")
+
+    result = subprocess.run(["diff", f"./test_files/{filename}", "giantman_output.tmp"], capture_output=True)
+
+    if result.returncode == 0:
+        print(f"{filename}: Decompressed data is identical to original data")
+    else:
+        print("/!\\ WARNING /!\\", end = "\t")
+        print(f"{filename}: Decompressed data differs from original data")
+
+def check_compression_size(filename):
+    original_size = os.path.getsize(f"./test_files/{filename}")
+    antman_output_size = os.path.getsize("antman_output.tmp")
+    compression_percentage = 100 - (antman_output_size * 100 / original_size)
+
+    if compression_percentage <= 0:
+        print(f"/!\\ WARNING /!\\", end = "\t")
+    print(f"{filename}: Compression percentage: {compression_percentage:.2f}%")
+
+def clean_tmp():
+    os.remove("giantman_output.tmp")
+    os.remove("antman_output.tmp")
+
+def main():
+    for filename in os.listdir("./test_files"):
+        check_compression_loss(filename)
+        check_compression_size(filename)
+        clean_tmp()
+        print("")
+
+
+if __name__ == "__main__":
+    main()
