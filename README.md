@@ -2,15 +2,6 @@
 ### Description
 Antman is a compression and decompression tool for text, HTML, and P3 PPM files. It uses the LZSS algorithm to compress and decompress files. The tool can be used through the command line with the `antman` and `giantman` executables.
 
-### Setup
-* Clone the repository:
-```bash
-git clone https://github.com/EpitechPromo2027/B-CPE-110-STG-1-1-antman-nathanael.moehn antman
-```
-* Go into the repository:
-```bash
-cd antman
-```
 * Compile the project:
 ```bash
 make
